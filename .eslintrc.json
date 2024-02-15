@@ -1,0 +1,64 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:react-hooks/recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": ["prettier", "import", "testing-library"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-console": "warn",
+
+    "react-hooks/exhaustive-deps": "warn",
+    "react/display-name": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          ["external", "builtin"],
+          ["parent", "internal"],
+          ["index", "sibling"]
+        ],
+        "newlines-between": "always"
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["./"],
+        "moduleDirectory": ["node_modules", "./*"],
+        "extensions": [".ts", ".tsx"]
+      }
+    },
+    "react": {
+      "version": "detect"
+    }
+  },
+  "overrides": [
+    {
+      "files": ["./**/*.test.tsx"],
+      "extends": ["plugin:testing-library/react"],
+      "rules": {
+        "testing-library/prefer-user-event": "error"
+      }
+    }
+  ]
+}
