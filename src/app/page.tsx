@@ -2,8 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 
-import { MaxWidthWrapper } from '@/components/max-width-wrapper';
 import { buttonVariants } from '@/components/ui/button';
+import { MaxWidthWrapper } from '@/components/layout/max-width-wrapper';
 
 export default function Home() {
   return (
@@ -131,7 +131,7 @@ export default function Home() {
                 Start asking questions
               </span>
               <span className="mt-2 text-zinc-700">
-                It&apos;s that simple. Try out Quill today - it really takes
+                It&apos;s that simple. Try out Reader today - it really takes
                 less than a minute.
               </span>
             </div>
