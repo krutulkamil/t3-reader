@@ -1,7 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
+import {
+  LoginLink,
+  RegisterLink,
+} from '@kinde-oss/kinde-auth-nextjs/components';
+import { ArrowRight } from 'lucide-react';
 
 import { MaxWidthWrapper } from '@/components/layout/max-width-wrapper';
+import { buttonVariants } from '@/components/ui/button';
 
 export function Navbar() {
   return (
@@ -11,6 +17,33 @@ export function Navbar() {
           <Link href="/" className="flex z-40 font-semibold">
             <span>Reader.</span>
           </Link>
+
+          <div className="hidden items-center space-x-4 sm:flex">
+            <Link
+              href="/pricing"
+              className={buttonVariants({
+                variant: 'ghost',
+                size: 'sm',
+              })}
+            >
+              Pricing
+            </Link>
+            <LoginLink
+              className={buttonVariants({
+                variant: 'ghost',
+                size: 'sm',
+              })}
+            >
+              Sign in
+            </LoginLink>
+            <RegisterLink
+              className={buttonVariants({
+                size: 'sm',
+              })}
+            >
+              Get started <ArrowRight className="ml-1.5 h-5 w-5" />
+            </RegisterLink>
+          </div>
         </div>
       </MaxWidthWrapper>
     </nav>
