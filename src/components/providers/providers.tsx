@@ -25,7 +25,6 @@ export function Providers({ children }: Readonly<ProvidersProps>) {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      {children}
     </trpc.Provider>
   );
 }
