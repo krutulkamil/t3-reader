@@ -1,5 +1,5 @@
-import { initTRPC, TRPCError } from "@trpc/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { initTRPC, TRPCError } from '@trpc/server';
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 
 const t = initTRPC.create();
 
@@ -17,7 +17,7 @@ const isAuthenticated = middleware(async (opts) => {
       ...opts.ctx,
       userId: user.id,
       user,
-    }
+    },
   });
 });
 
