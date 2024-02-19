@@ -1,14 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Dropzone, { type DropEvent, type FileRejection } from 'react-dropzone';
 import { Cloud, File, Loader2 } from 'lucide-react';
 
+import { useUploadThing } from '@/lib/uploadthing';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/components/ui/use-toast';
+import { trpc } from '@/app/_trpc/client';
 
 export function UploadDropzone() {
+  const router = useRouter();
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+
+  const { toast } = useToast();
+  const { startUpload } = useUploadThing('pdfUploader');
+
+  const { mutate: startPolling } = trpc.getFile.useMutation({
+    onSuccess: (file) => {
+      router.push(`/dashboard/${file.id}`);
+    },
+    retry: true,
+    retryDelay: 500,
+  });
 
   function startSimulatedProgress() {
     setUploadProgress(0);
@@ -27,16 +44,31 @@ export function UploadDropzone() {
     return interval;
   }
 
-  function handleDropFile<T extends File>(
-    _acceptedFiles: T[],
+  async function handleDropFile<T extends File>(
+    acceptedFiles: T[],
     _fileRejections: FileRejection[],
     _event: DropEvent
   ) {
     setIsUploading(true);
     const progressInterval = startSimulatedProgress();
 
+    const res = await startUpload(acceptedFiles);
+    if (!res) {
+      return toast({
+        title: 'Something went wrong',
+        description:
+          'Something went wrong while uploading your file. Try again later.',
+        variant: 'destructive',
+      });
+    }
+
+    const [fileResponse] = res;
+    const { key } = fileResponse;
+
     clearTimeout(progressInterval);
     setUploadProgress(100);
+
+    startPolling({ key });
   }
 
   return (
@@ -47,10 +79,7 @@ export function UploadDropzone() {
           className="border h-64 m-4 border-dashed border-gray-300 rounded-lg"
         >
           <div className="flex items-center justify-center h-full w-full">
-            <label
-              htmlFor="dropzone-file"
-              className="flex flex-col items-center justify-center w-full h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-            >
+            <div className="flex flex-col items-center justify-center w-full h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Cloud className="h-6 w-6 text-zinc-500 mb-2" />
                 <p className="mb-2 text-sm text-zinc-700">
@@ -74,9 +103,7 @@ export function UploadDropzone() {
               {isUploading ? (
                 <div className="w-full mt-4 max-w-xs mx-auto">
                   <Progress
-                    indicatorColor={
-                      uploadProgress === 100 ? 'bg-green-500' : ''
-                    }
+                    color={uploadProgress === 100 ? 'bg-green-500' : ''}
                     value={uploadProgress}
                     className="h-1 w-full bg-zinc-200"
                   />
@@ -88,7 +115,14 @@ export function UploadDropzone() {
                   ) : null}
                 </div>
               ) : null}
-            </label>
+
+              <input
+                {...getInputProps()}
+                type="file"
+                id="dropzone-file"
+                className="hidden"
+              />
+            </div>
           </div>
         </div>
       )}

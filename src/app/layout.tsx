@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/layout/navbar';
 import { Providers } from '@/components/providers/providers';
+import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
             inter.className
           )}
         >
+          <Toaster />
           <Navbar />
           {children}
         </body>
