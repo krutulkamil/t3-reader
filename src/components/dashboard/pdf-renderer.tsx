@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useForm } from 'react-hook-form';
 import { useResizeDetector } from 'react-resize-detector';
-import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, RotateCw, Search } from 'lucide-react';
 import SimpleBar from 'simplebar-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -35,6 +35,7 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
   const [numPages, setNumPages] = useState<number | undefined>(undefined);
   const [currPage, setCurrPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
+  const [rotation, setRotation] = useState<number>(0);
 
   const pageInputSchema = getPageInputSchema(numPages);
   type PageInput = z.infer<typeof pageInputSchema>;
@@ -143,6 +144,14 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            onClick={() => setRotation((prev) => (prev + 90) % 360)}
+            aria-label="rotate"
+            variant="ghost"
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -162,7 +171,12 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
               }
               className="max-h-full"
             >
-              <Page width={width} pageNumber={currPage} scale={scale} />
+              <Page
+                width={width}
+                pageNumber={currPage}
+                scale={scale}
+                rotate={rotation}
+              />
             </Document>
           </div>
         </SimpleBar>
