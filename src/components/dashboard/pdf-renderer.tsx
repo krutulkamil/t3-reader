@@ -30,6 +30,9 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
   const [currPage, setCurrPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
   const [rotation, setRotation] = useState<number>(0);
+  const [renderedScale, setRenderedScale] = useState<number | null>(null);
+
+  const isLoading = renderedScale !== scale;
 
   const pageInputSchema = getPageInputSchema(numPages);
   type PageInput = z.infer<typeof pageInputSchema>;
@@ -138,6 +141,9 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
             rotation={rotation}
             numPages={numPages}
             onPageNumChange={setNumPages}
+            renderedScale={renderedScale}
+            isLoading={isLoading}
+            onRenderedScale={setRenderedScale}
           />
         </SimpleBar>
       </div>

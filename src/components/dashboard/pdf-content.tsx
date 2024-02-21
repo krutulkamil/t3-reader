@@ -4,6 +4,7 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import { DocumentLoader } from '@/components/dashboard/document-loader';
 import { toast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 
 interface PdfContentProps {
   url: string;
@@ -13,6 +14,9 @@ interface PdfContentProps {
   scale: number;
   rotation: number;
   isFullScreen?: boolean;
+  renderedScale?: number | null;
+  isLoading?: boolean;
+  onRenderedScale?: (scale: number) => void;
 }
 
 export const PdfContent = ({
@@ -20,9 +24,12 @@ export const PdfContent = ({
   numPages,
   currPage,
   scale,
+  renderedScale,
   rotation,
   onPageNumChange,
   isFullScreen = false,
+  isLoading = false,
+  onRenderedScale,
 }: Readonly<PdfContentProps>) => {
   const { ref, width } = useResizeDetector();
 
@@ -46,12 +53,27 @@ export const PdfContent = ({
             .fill(0)
             .map((_, i) => <Page key={i} width={width} pageNumber={i + 1} />)
         ) : (
-          <Page
-            width={width}
-            pageNumber={currPage}
-            scale={scale}
-            rotate={rotation}
-          />
+          <>
+            {isLoading && renderedScale ? (
+              <Page
+                width={width}
+                pageNumber={currPage}
+                scale={scale}
+                rotate={rotation}
+                key={'@' + renderedScale}
+              />
+            ) : null}
+            <Page
+              className={cn(isLoading ? 'hidden' : '')}
+              width={width}
+              pageNumber={currPage}
+              scale={scale}
+              rotate={rotation}
+              key={'@' + scale}
+              loading={DocumentLoader}
+              onRenderSuccess={() => onRenderedScale?.(scale)}
+            />
+          </>
         )}
       </Document>
     </div>
