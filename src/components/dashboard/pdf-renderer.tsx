@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { pdfjs } from 'react-pdf';
 import { useForm } from 'react-hook-form';
-import { useResizeDetector } from 'react-resize-detector';
-import { ChevronDown, ChevronUp, RotateCw, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
 import SimpleBar from 'simplebar-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,18 +11,13 @@ import { z } from 'zod';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import { useToast } from '@/components/ui/use-toast';
-import { DocumentLoader } from '@/components/dashboard/document-loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { PdfFullScreen } from '@/components/dashboard/pdf-full-screen';
+import { PdfContent } from '@/components/dashboard/pdf-content';
 import { getPageInputSchema } from '@/schemas/pageInputSchema';
 import { cn } from '@/lib/utils';
+import { PdfRotate } from '@/components/dashboard/pdf-rotate';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -53,9 +47,6 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
     mode: 'onChange',
   });
 
-  const { toast } = useToast();
-  const { ref, width } = useResizeDetector();
-
   function handlePageSubmit({ page }: PageInput) {
     setCurrPage(Number(page));
     setValue('page', page);
@@ -72,7 +63,10 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
       <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-between px-2">
         <div className="flex items-center gap-1.5">
           <Button
-            onClick={() => setCurrPage((prev) => (prev - 1 > 1 ? prev - 1 : 1))}
+            onClick={() => {
+              setCurrPage((prev) => (prev - 1 > 1 ? prev - 1 : 1));
+              setValue('page', String(currPage - 1));
+            }}
             disabled={currPage <= 1}
             variant="ghost"
             aria-label="previous page"
@@ -96,11 +90,12 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
           </div>
 
           <Button
-            onClick={() =>
+            onClick={() => {
               setCurrPage((prev) =>
                 prev + 1 > (numPages ?? 0) ? numPages ?? 0 : prev + 1
-              )
-            }
+              );
+              setValue('page', String(currPage + 1));
+            }}
             disabled={numPages === undefined || currPage >= numPages}
             variant="ghost"
             aria-label="next page"
@@ -110,40 +105,7 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
         </div>
 
         <div className="space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="gap-1.5" aria-label="zoom" variant="ghost">
-                <Search className="h-4 w-4" />
-                {scale * 100}% <ChevronDown className="h-3 w-3 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => setScale(1)}
-              >
-                100%
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => setScale(1.5)}
-              >
-                150%
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => setScale(2)}
-              >
-                200%
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => setScale(2.5)}
-              >
-                250%
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <PdfRotate scale={scale} onScaleChange={setScale} />
 
           <Button
             onClick={() => setRotation((prev) => (prev + 90) % 360)}
@@ -152,33 +114,31 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
           >
             <RotateCw className="h-4 w-4" />
           </Button>
+
+          <PdfFullScreen>
+            <PdfContent
+              url={url}
+              currPage={currPage}
+              scale={scale}
+              rotation={rotation}
+              numPages={numPages}
+              onPageNumChange={setNumPages}
+              isFullScreen
+            />
+          </PdfFullScreen>
         </div>
       </div>
 
       <div className="flex-1 w-full max-h-screen">
         <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)]">
-          <div ref={ref}>
-            <Document
-              file={url}
-              loading={DocumentLoader}
-              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-              onLoadError={(error) =>
-                toast({
-                  title: 'Error',
-                  description: error.message,
-                  variant: 'destructive',
-                })
-              }
-              className="max-h-full"
-            >
-              <Page
-                width={width}
-                pageNumber={currPage}
-                scale={scale}
-                rotate={rotation}
-              />
-            </Document>
-          </div>
+          <PdfContent
+            url={url}
+            currPage={currPage}
+            scale={scale}
+            rotation={rotation}
+            numPages={numPages}
+            onPageNumChange={setNumPages}
+          />
         </SimpleBar>
       </div>
     </div>
