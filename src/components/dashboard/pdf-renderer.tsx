@@ -2,8 +2,11 @@
 
 import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { useForm } from 'react-hook-form';
 import { useResizeDetector } from 'react-resize-detector';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -12,6 +15,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { DocumentLoader } from '@/components/dashboard/document-loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getPageInputSchema } from '@/schemas/pageInputSchema';
+import { cn } from '@/lib/utils';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -23,8 +28,35 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
   const [numPages, setNumPages] = useState<number | undefined>(undefined);
   const [currPage, setCurrPage] = useState<number>(1);
 
+  const pageInputSchema = getPageInputSchema(numPages);
+  type PageInput = z.infer<typeof pageInputSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<PageInput>({
+    defaultValues: {
+      page: '1',
+    },
+    resolver: zodResolver(pageInputSchema),
+    mode: 'onChange',
+  });
+
   const { toast } = useToast();
   const { ref, width } = useResizeDetector();
+
+  function handlePageSubmit({ page }: PageInput) {
+    setCurrPage(Number(page));
+    setValue('page', page);
+  }
+
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      handleSubmit(handlePageSubmit)();
+    }
+  }
 
   return (
     <div className="w-full bg-white rounded-md shadow flex flex-col items-center">
@@ -40,7 +72,14 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
           </Button>
 
           <div className="flex items-center gap-1.5">
-            <Input className="w-12 h-8" />
+            <Input
+              {...register('page')}
+              onKeyDown={handleInputKeyDown}
+              className={cn(
+                'w-12 h-8',
+                errors.page && 'focus-visible:ring-red-500'
+              )}
+            />
             <p className="text-zinc-700 text-sm space-x-1">
               <span>/</span>
               <span>{numPages ?? 'x'}</span>
