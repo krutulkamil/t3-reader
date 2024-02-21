@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useForm } from 'react-hook-form';
 import { useResizeDetector } from 'react-resize-detector';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import SimpleBar from 'simplebar-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -15,6 +16,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { DocumentLoader } from '@/components/dashboard/document-loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { getPageInputSchema } from '@/schemas/pageInputSchema';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +34,7 @@ interface PdfRendererProps {
 export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
   const [numPages, setNumPages] = useState<number | undefined>(undefined);
   const [currPage, setCurrPage] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1);
 
   const pageInputSchema = getPageInputSchema(numPages);
   type PageInput = z.infer<typeof pageInputSchema>;
@@ -99,26 +107,65 @@ export function PdfRenderer({ url }: Readonly<PdfRendererProps>) {
             <ChevronUp className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="gap-1.5" aria-label="zoom" variant="ghost">
+                <Search className="h-4 w-4" />
+                {scale * 100}% <ChevronDown className="h-3 w-3 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => setScale(1)}
+              >
+                100%
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => setScale(1.5)}
+              >
+                150%
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => setScale(2)}
+              >
+                200%
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => setScale(2.5)}
+              >
+                250%
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="flex-1 w-full max-h-screen">
-        <div ref={ref}>
-          <Document
-            file={url}
-            loading={DocumentLoader}
-            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-            onLoadError={(error) =>
-              toast({
-                title: 'Error',
-                description: error.message,
-                variant: 'destructive',
-              })
-            }
-            className="max-h-full"
-          >
-            <Page width={width} pageNumber={currPage} />
-          </Document>
-        </div>
+        <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)]">
+          <div ref={ref}>
+            <Document
+              file={url}
+              loading={DocumentLoader}
+              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+              onLoadError={(error) =>
+                toast({
+                  title: 'Error',
+                  description: error.message,
+                  variant: 'destructive',
+                })
+              }
+              className="max-h-full"
+            >
+              <Page width={width} pageNumber={currPage} scale={scale} />
+            </Document>
+          </div>
+        </SimpleBar>
       </div>
     </div>
   );
