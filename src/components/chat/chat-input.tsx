@@ -1,5 +1,9 @@
 import React from 'react';
 
-export function ChatInput() {
+interface ChatInputProps {
+  isDisabled?: boolean;
+}
+
+export function ChatInput({ isDisabled = false }: Readonly<ChatInputProps>) {
   return <div>ChatInput</div>;
 }

@@ -1,5 +1,9 @@
 import React from 'react';
 
-export function Messages() {
+interface MessagesProps {
+  fileId: string;
+}
+
+export function Messages({ fileId }: Readonly<MessagesProps>) {
   return <div>Messages</div>;
 }
