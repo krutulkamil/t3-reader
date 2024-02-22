@@ -13,11 +13,11 @@ import 'react-pdf/dist/Page/TextLayer.css';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PdfFullScreen } from '@/components/dashboard/pdf-full-screen';
-import { PdfContent } from '@/components/dashboard/pdf-content';
+import { PdfFullScreen } from '@/components/pdf/pdf-full-screen';
+import { PdfContent } from '@/components/pdf/pdf-content';
+import { PdfRotate } from '@/components/pdf/pdf-rotate';
 import { getPageInputSchema } from '@/schemas/pageInputSchema';
 import { cn } from '@/lib/utils';
-import { PdfRotate } from '@/components/dashboard/pdf-rotate';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 

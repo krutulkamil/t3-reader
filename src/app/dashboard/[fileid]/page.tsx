@@ -3,8 +3,8 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 
 import { db } from '@/db';
-import { PdfRenderer } from '@/components/dashboard/pdf-renderer';
-import { ChatWrapper } from '@/components/dashboard/chat-wrapper';
+import { PdfRenderer } from '@/components/pdf/pdf-renderer';
+import { ChatWrapper } from '@/components/chat/chat-wrapper';
 
 interface FilePageProps {
   params: {
