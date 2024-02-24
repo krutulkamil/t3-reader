@@ -1,4 +1,10 @@
-import React, { useState, useMemo, createContext, type ReactNode } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  createContext,
+  type ReactNode,
+} from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { useToast } from '@/components/ui/use-toast';
@@ -50,9 +56,9 @@ export function ChatContextProvider({
     },
   });
 
-  function addMessage() {
+  const addMessage = useCallback(() => {
     return sendMessage({ message });
-  }
+  }, [sendMessage, message]);
 
   function handleInputChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setMessage(event.target.value);
@@ -65,7 +71,7 @@ export function ChatContextProvider({
       handleInputChange,
       isLoading,
     }),
-    [addMessage, message, handleInputChange, isLoading]
+    [addMessage, message, isLoading]
   );
 
   return (
