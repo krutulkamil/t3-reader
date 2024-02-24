@@ -12,6 +12,7 @@ const envVariablesSchema = z.object({
   UPLOADTHING_SECRET: z.string(),
   UPLOADTHING_APP_ID: z.string(),
   PINECONE_API_KEY: z.string(),
+  OPENAI_API_KEY: z.string(),
 });
 
 envVariablesSchema.parse(process.env);
