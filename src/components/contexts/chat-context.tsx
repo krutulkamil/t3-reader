@@ -57,7 +57,8 @@ export function ChatContextProvider({
   });
 
   const addMessage = useCallback(() => {
-    return sendMessage({ message });
+    sendMessage({ message });
+    setMessage('');
   }, [sendMessage, message]);
 
   function handleInputChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
