@@ -1,6 +1,7 @@
 import React, {
   useState,
   useCallback,
+  useRef,
   useMemo,
   createContext,
   type ReactNode,
@@ -8,6 +9,8 @@ import React, {
 import { useMutation } from '@tanstack/react-query';
 
 import { useToast } from '@/components/ui/use-toast';
+import { trpc } from '@/app/_trpc/client';
+import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query';
 
 type StreamResponse = {
   addMessage: () => void;
@@ -35,7 +38,10 @@ export function ChatContextProvider({
   const [message, setMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const utils = trpc.useUtils();
   const { toast } = useToast();
+
+  const backupMessage = useRef('');
 
   const { mutate: sendMessage } = useMutation({
     mutationFn: async ({ message }: { message: string }) => {
@@ -53,6 +59,56 @@ export function ChatContextProvider({
       }
 
       return response.body;
+    },
+    onMutate: async ({ message }) => {
+      backupMessage.current = message;
+      setMessage('');
+
+      await utils.getFileMessages.cancel();
+
+      const previousMessages = utils.getFileMessages.getInfiniteData();
+
+      utils.getFileMessages.setInfiniteData(
+        {
+          fileId,
+          limit: INFINITE_QUERY_LIMIT,
+        },
+        (old) => {
+          if (!old) {
+            return {
+              pages: [],
+              pageParams: [],
+            };
+          }
+
+          const newPages = [...old.pages];
+          const latestPage = newPages[0];
+
+          latestPage.messages = [
+            {
+              id: crypto.randomUUID(),
+              text: message,
+              isUserMessage: true,
+              createdAt: new Date().toISOString(),
+            },
+            ...latestPage.messages,
+          ];
+
+          newPages[0] = latestPage;
+
+          return {
+            ...old,
+            pages: newPages,
+          };
+        }
+      );
+
+      setIsLoading(true);
+
+      return {
+        previousMessages:
+          previousMessages?.pages.flatMap((page) => page.messages) ?? [],
+      };
     },
   });
 
