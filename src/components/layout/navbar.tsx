@@ -8,8 +8,9 @@ import { ArrowRight } from 'lucide-react';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 
 import { MaxWidthWrapper } from '@/components/layout/max-width-wrapper';
-import { buttonVariants } from '@/components/ui/button';
 import { UserAccountNav } from '@/components/layout/user-account-nav';
+import { MobileNav } from '@/components/layout/mobile-nav';
+import { buttonVariants } from '@/components/ui/button';
 
 export async function Navbar() {
   const { getUser } = getKindeServerSession();
@@ -22,6 +23,8 @@ export async function Navbar() {
           <Link href="/" className="flex z-40 font-semibold">
             <span>Reader.</span>
           </Link>
+
+          <MobileNav isAuth={!!user} />
 
           <div className="hidden items-center space-x-4 sm:flex">
             {!user ? (
