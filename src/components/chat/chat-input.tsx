@@ -53,7 +53,6 @@ export function ChatInput({ isDisabled = false }: Readonly<ChatInputProps>) {
                 aria-label="send message"
                 className="absolute bottom-1.5 right-[8px]"
                 disabled={isDisabled || isLoading || !message}
-                type="submit"
                 onClick={handleButtonClick}
               >
                 <Send className="h-4 w-4" />

@@ -15,6 +15,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
   ({ message, isNextMessageSamePerson }, ref) => {
     return (
       <div
+        ref={ref}
         className={cn('flex items-end', {
           'justify-end': message.isUserMessage,
         })}
