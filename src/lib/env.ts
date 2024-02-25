@@ -14,6 +14,7 @@ const envVariablesSchema = z.object({
   PINECONE_API_KEY: z.string(),
   OPENAI_API_KEY: z.string(),
   STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
 });
 
 envVariablesSchema.parse(process.env);
