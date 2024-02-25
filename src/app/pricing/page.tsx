@@ -36,7 +36,7 @@ export default async function PricingPage() {
         <TooltipProvider>
           {pricingItems.map(({ plan, tagline, quota, features }) => {
             const price =
-              PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount ||
+              PLANS.find((p) => p.slug === plan.toLowerCase())?.price.amount ??
               0;
 
             return (
