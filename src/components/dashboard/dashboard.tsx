@@ -6,12 +6,17 @@ import Skeleton from 'react-loading-skeleton';
 import { Loader2, MessageSquare, Plus, Trash } from 'lucide-react';
 import { format } from 'date-fns';
 
-import { trpc } from '@/app/_trpc/client';
 import { UploadButton } from '@/components/dashboard/upload-button';
 import { NoFilesYet } from '@/components/dashboard/no-files-yet';
 import { Button } from '@/components/ui/button';
+import { getUserSubscriptionPlan } from '@/lib/stripe';
+import { trpc } from '@/app/_trpc/client';
 
-export function Dashboard() {
+interface DashboardProps {
+  subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
+}
+
+export function Dashboard({ subscriptionPlan }: Readonly<DashboardProps>) {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] = useState<
     string | null
   >(null);
@@ -45,7 +50,7 @@ export function Dashboard() {
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
         <h1 className="mb-3 font-bold text-5xl text-gray-900">My Files</h1>
 
-        <UploadButton />
+        <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
       </div>
 
       {files?.length ? (

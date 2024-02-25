@@ -6,7 +6,11 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { UploadDropzone } from '@/components/dashboard/upload-dropzone';
 
-export function UploadButton() {
+interface UploadButtonProps {
+  isSubscribed: boolean;
+}
+
+export function UploadButton({ isSubscribed }: Readonly<UploadButtonProps>) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   function handleOpenChange(open: boolean) {
@@ -22,7 +26,7 @@ export function UploadButton() {
       </DialogTrigger>
 
       <DialogContent>
-        <UploadDropzone />
+        <UploadDropzone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
   );
